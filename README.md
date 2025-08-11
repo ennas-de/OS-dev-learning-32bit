@@ -2,6 +2,11 @@
 
 This repository contains my journey through learning operating system development for 32-bit architecture. Each directory represents a different stage of the learning process, progressively building up from bare metal to more complex OS features.
 
+## Author
+
+**Muhammed Abdulhakeem**  
+Email: dev.abdulhakeem@gmail.com
+
 ## Project Structure
 
 1. `1_bare_metal/` - Basic bootloader and kernel setup
@@ -35,6 +40,23 @@ make
 ```
 
 This will create an ISO file in the `iso/` directory that can be run in QEMU or other virtual machines.
+
+### GRUB Bootloader Configuration
+
+This project uses GRUB (Grand Unified Bootloader) as the bootloader. The GRUB configuration file is located at:
+```
+MyOS/boot/grub/grub.cfg
+```
+
+To modify the GRUB menu entry name that appears during boot, edit the `grub.cfg` file. The default configuration looks like:
+```
+menuentry "My Operating System" {
+    multiboot /boot/kernel    # Path to your kernel binary
+    boot
+}
+```
+
+You can change "My Operating System" to any name you prefer for your OS.
 
 ## Requirements
 
