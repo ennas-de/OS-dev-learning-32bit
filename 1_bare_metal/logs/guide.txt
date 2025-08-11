@@ -1,0 +1,54 @@
+Your code is written for the GNU assembler (GAS, usually .S or .s files), not NASM. The syntax and directives are different between GAS and NASM. Here are the main issues:
+
+Directives:
+
+GAS (AT&T) uses .set, .section, .align, .skip, .type, .global, etc.
+NASM (INTEL) uses section, align, resb, global, etc. (no dot prefix).
+Instruction Syntax:
+
+GAS uses AT&T syntax (mov $stack_top, %esp) - left <- right.
+NASM uses Intel syntax (mov esp, stack_top) - left -> right.
+Constants:
+
+GAS uses .set for constants.
+NASM uses %define or equ.
+To fix for NASM, you need to:
+
+Replace all GAS directives with NASM equivalents.
+Use Intel instruction syntax.
+Use NASM constant definitions.
+
+Example NASM version:
+
+%define ALIGN      1<<0
+%define MEMINFO    1<<1
+%define FLAGS      (ALIGN | MEMINFO)
+%define MAGIC      0x1BADB002
+%define CHECKSUM   -(MAGIC + FLAGS)
+
+section .multiboot
+align 4
+    dd MAGIC
+    dd FLAGS
+    dd CHECKSUM
+
+section .bss
+stack_bottom:
+    resb 16384
+stack_top:
+
+section .text
+global _start
+
+_start:
+    mov esp, stack_top
+    call kernel_main
+
+    cli
+.halt:
+    hlt
+    jmp .halt
+
+
+Summary:
+Your errors are because NASM does not understand GAS syntax. Convert your code as above and it should assemble with NASM.

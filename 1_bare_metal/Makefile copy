@@ -1,0 +1,42 @@
+# compler and tools
+CC		= gcc
+ASM		= nasm
+LD      = ld
+
+# folder structure
+SRC     = src
+BUILD   = build
+BOOT    = boot
+ISO     = iso
+
+# files 
+KERNEL_SRC	= $(SRC)/kernel.c
+BOOT_SRC	= $(SRC)/bootloader/boot.s
+LINKER		= $(SRC)/linker.ld
+
+KERNEL_OBJ	= $(BUILD)/kernel.o
+BOOT_OBJ	= $(BUILD)/boot.o
+KERNEL_BIN	= $(BOOT)/kernel
+ISO_IMG		= $(ISO)/kernel.iso
+
+.PHONY: all clean kernel boot image run 
+
+all: clean boot kernel image run 
+
+clean:
+	rm -rf $(BUILD)/*.o
+	rm -rf $(KERNEL_BIN)
+	rm -rf $(ISO_IMG)
+
+kernel: $(KERNEL_SRC)
+	$(CC) -m32 -fno-stack-protector -fno-builtin -nostdlib -c $< -o $(KERNEL_OBJ)
+
+boot: $(BOOT_SRC)
+	$(ASM) -f elf32 $< -o $(BOOT_OBJ)
+
+image: $(BOOT_OBJ) $(KERNEL_OBJ)
+	$(LD) -m elf_i386 -T $(LINKER) -o $(KERNEL_BIN) $(BOOT_OBJ) $(KERNEL_OBJ)
+	grub-mkrescue -o $(ISO_IMG) $(BOOT)/
+
+run: $(ISO_IMG)
+	qemu-system-i386 -cdrom $<
